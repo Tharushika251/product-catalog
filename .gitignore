@@ -1,0 +1,37 @@
+# Visual Studio files
+.vs/
+.vscode/
+*.swp
+*.swo
+
+# Frontend
+frontend/product-catalog-ui/node_modules/
+frontend/product-catalog-ui/.env
+frontend/product-catalog-ui/.env.local
+frontend/product-catalog-ui/.env.development.local
+frontend/product-catalog-ui/.env.test.local
+frontend/product-catalog-ui/.env.production.local
+frontend/product-catalog-ui/npm-debug.log*
+frontend/product-catalog-ui/yarn-debug.log*
+frontend/product-catalog-ui/yarn-error.log*
+frontend/product-catalog-ui/build/
+
+# Backend
+backend/ProductCatalog.API/bin/
+backend/ProductCatalog.API/obj/
+backend/ProductCatalog.API/appsettings.Development.json
+backend/ProductCatalog.API/appsettings.Production.json
+*.db
+*.sqlite3
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
