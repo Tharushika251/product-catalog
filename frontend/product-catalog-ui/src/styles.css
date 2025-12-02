@@ -28,6 +28,23 @@ body {
     height: 3rem;
 }
 
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.25em;
+}
+
+/* Improve mobile form */
+@media (max-width: 576px) {
+    .form-container {
+        padding: 1rem !important;
+    }
+
+    .card {
+        margin: 0.5rem;
+    }
+}
+
 /* Mobile responsiveness  */
 @media (max-width: 768px) {
     .form-container {

@@ -21,6 +21,30 @@ const ProductForm = ({ onProductAdded }) => {
         'Other'
     ];
 
+    // Add this helper function inside the component
+    const validatePrice = (price) => {
+        if (!price) return { isValid: false, message: 'Price is required' };
+
+        // Check if it's a valid number
+        if (isNaN(price)) {
+            return { isValid: false, message: 'Price must be a valid number' };
+        }
+
+        // Check if positive
+        if (parseFloat(price) <= 0) {
+            return { isValid: false, message: 'Price must be greater than zero' };
+        }
+
+        // Check decimal places
+        const decimalPart = price.toString().split('.')[1];
+        if (decimalPart && decimalPart.length > 2) {
+            return { isValid: false, message: 'Price can have up to 2 decimal places' };
+        }
+
+        return { isValid: true, message: '' };
+    };
+
+    // Update the validateForm function to use this helper
     const validateForm = () => {
         const newErrors = {};
 
@@ -28,15 +52,9 @@ const ProductForm = ({ onProductAdded }) => {
             newErrors.product_name = 'Product name is required';
         }
 
-        if (!formData.price) {
-            newErrors.price = 'Price is required';
-        } else {
-            const priceRegex = /^\d+(\.\d{1,2})?$/;
-            if (!priceRegex.test(formData.price)) {
-                newErrors.price = 'Price must be a positive number with up to 2 decimal places';
-            } else if (parseFloat(formData.price) <= 0) {
-                newErrors.price = 'Price must be greater than zero';
-            }
+        const priceValidation = validatePrice(formData.price);
+        if (!priceValidation.isValid) {
+            newErrors.price = priceValidation.message;
         }
 
         setErrors(newErrors);
@@ -69,15 +87,18 @@ const ProductForm = ({ onProductAdded }) => {
                 price: parseFloat(formData.price).toFixed(2)
             };
 
-            await onProductAdded(productToSubmit);
+            const result = await onProductAdded(productToSubmit);
 
-            setFormData({
-                product_name: '',
-                price: '',
-                description: '',
-                category: ''
-            });
-            setErrors({});
+            // Only reset form if successful (result is truthy)
+            if (result) {
+                setFormData({
+                    product_name: '',
+                    price: '',
+                    description: '',
+                    category: ''
+                });
+                setErrors({});
+            }
         } finally {
             setIsSubmitting(false);
         }

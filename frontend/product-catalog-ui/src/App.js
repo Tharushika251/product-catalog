@@ -7,7 +7,6 @@ import { productService } from './services/api';
 const App = () => {
     const [products, setProducts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [notification, setNotification] = useState({
         message: '',
         type: ''
@@ -23,13 +22,12 @@ const App = () => {
 
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
-        setError(null);
 
         try {
             const data = await productService.getProducts();
             setProducts(data);
         } catch (err) {
-            setError(err.message);
+            console.error('Failed to load products:', err);
             showNotification('Failed to load products. Please try again.', 'error');
         } finally {
             setIsLoading(false);
@@ -39,19 +37,14 @@ const App = () => {
     const handleProductAdded = async (productData) => {
         try {
             const newProduct = await productService.addProduct(productData);
-
             setProducts(prev => [newProduct, ...prev]);
             showNotification('Product added successfully!', 'success');
-
             return newProduct;
         } catch (err) {
-            // Check for duplicate product error
-            if (err.message.includes('already exists') || err.message.includes('duplicate')) {
-                showNotification('Product with this name already exists!', 'error');
-            } else {
-                showNotification(err.message || 'Failed to add product', 'error');
-            }
-            throw err;
+            // Show error notification
+            showNotification(err.message, 'error');
+            // Do not re-throw - this prevents uncaught errors
+            console.log('Product addition failed:', err.message);
         }
     };
 
@@ -63,7 +56,7 @@ const App = () => {
         <div className="container-fluid py-4">
             <div className="row">
                 <div className="col-12">
-                    <header className="text-center mb-5">
+                    <header className="text-center mb-3">
                         <h1 className="display-4 fw-bold text-primary mb-3">
                             <i className="bi bi-shop me-3"></i>
                             Product Catalog Manager
@@ -98,7 +91,6 @@ const App = () => {
                         <ProductList
                             products={products}
                             isLoading={isLoading}
-                            error={error}
                         />
                     </div>
                 </div>
