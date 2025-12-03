@@ -113,7 +113,7 @@ Desktop View
 Mobile View 
 ![Mobile](screenshots/mobile-view.png) |
 
-## 🧪 Testing the Application
+## Testing the Application
 
 ### Test Scenarios:
 1. **Add New Product**
@@ -133,47 +133,6 @@ Mobile View
 4. **Responsive Design**
    - Resize browser to mobile width
    - Form and product cards should adjust automatically
-
-## Project Structure
-
-product-catalog/
-├── frontend/                    # React Application
-│   ├── public/
-│   │   └── index.html
-│   ├── src/
-│   │   ├── components/         # React Components
-│   │   │   ├── ProductForm.js
-│   │   │   ├── ProductList.js
-│   │   │   ├── Notification.js
-│   │   │   └── ErrorBoundary.js
-│   │   ├── services/          # API Services
-│   │   │   └── api.js
-│   │   ├── App.js            # Main App Component
-│   │   ├── index.js          # Entry Point
-│   │   └── styles.css        # Custom Styles
-│   └── package.json
-│
-├── backend/                    # .NET Web API
-│   └── ProductCatalog.API/
-│       ├── Controllers/       # API Controllers
-│       │   └── ProductsController.cs
-│       ├── Data/             # Database Context
-│       │   └── ApplicationDbContext.cs
-│       ├── DTOs/             # Data Transfer Objects
-│       │   ├── CreateProductDto.cs
-│       │   └── ProductDto.cs
-│       ├── Models/           # Entity Models
-│       │   └── Product.cs
-│       ├── Services/         # Business Logic
-│       │   ├── IProductService.cs
-│       │   └── ProductService.cs
-│       ├── Program.cs        # Startup Configuration
-│       ├── appsettings.json  # Configuration
-│       └── ProductCatalog.API.csproj
-│
-├── screenshots/              # Application Screenshots
-├── .gitignore               # Git Ignore Rules
-└── README.md               # This File
 
 ## Security Features
 
