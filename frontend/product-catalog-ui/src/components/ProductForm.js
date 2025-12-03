@@ -10,6 +10,7 @@ const ProductForm = ({ onProductAdded }) => {
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [duplicateCheck, setDuplicateCheck] = useState({ checking: false, exists: false });
 
     const categories = [
         'Electronics',
@@ -21,7 +22,23 @@ const ProductForm = ({ onProductAdded }) => {
         'Other'
     ];
 
-    // Add this helper function inside the component
+    const checkDuplicate = async (productName) => {
+        if (!productName.trim() || productName.length < 2) return;
+
+        setDuplicateCheck({ checking: true, exists: false });
+
+        try {
+            const response = await fetch(`http://localhost:5000/api/products/check/${encodeURIComponent(productName)}`);
+            if (response.ok) {
+                const exists = await response.json();
+                setDuplicateCheck({ checking: false, exists });
+            }
+        } catch (error) {
+            console.error('Error checking duplicate:', error);
+            setDuplicateCheck({ checking: false, exists: false });
+        }
+    };
+
     const validatePrice = (price) => {
         if (!price) return { isValid: false, message: 'Price is required' };
 
@@ -30,8 +47,10 @@ const ProductForm = ({ onProductAdded }) => {
             return { isValid: false, message: 'Price must be a valid number' };
         }
 
+        const numPrice = parseFloat(price);
+
         // Check if positive
-        if (parseFloat(price) <= 0) {
+        if (numPrice <= 0) {
             return { isValid: false, message: 'Price must be greater than zero' };
         }
 
@@ -41,20 +60,47 @@ const ProductForm = ({ onProductAdded }) => {
             return { isValid: false, message: 'Price can have up to 2 decimal places' };
         }
 
+        // Check reasonable maximum
+        if (numPrice > 1000000) {
+            return { isValid: false, message: 'Price cannot exceed $1,000,000' };
+        }
+
+        // Check for too many digits (prevent overflow)
+        if (price.toString().replace('.', '').length > 15) {
+            return { isValid: false, message: 'Price is too large' };
+        }
+
         return { isValid: true, message: '' };
     };
 
-    // Update the validateForm function to use this helper
     const validateForm = () => {
         const newErrors = {};
 
+        // Product Name
         if (!formData.product_name.trim()) {
             newErrors.product_name = 'Product name is required';
+        } else if (formData.product_name.length < 2) {
+            newErrors.product_name = 'Product name must be at least 2 characters';
+        } else if (formData.product_name.length > 200) {
+            newErrors.product_name = 'Product name cannot exceed 200 characters';
         }
 
+        // Price
         const priceValidation = validatePrice(formData.price);
         if (!priceValidation.isValid) {
             newErrors.price = priceValidation.message;
+        } else if (parseFloat(formData.price) > 1000000) {
+            newErrors.price = 'Price cannot exceed $1,000,000';
+        }
+
+        // Description (if provided)
+        if (formData.description && formData.description.length > 1000) {
+            newErrors.description = 'Description cannot exceed 1000 characters';
+        }
+
+        // Category (if selected)
+        if (formData.category && formData.category.length > 100) {
+            newErrors.category = 'Category cannot exceed 100 characters';
         }
 
         setErrors(newErrors);
@@ -63,22 +109,45 @@ const ProductForm = ({ onProductAdded }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+
+        // Sanitize input
+        let sanitizedValue = value;
+        if (name === 'product_name' || name === 'description') {
+            sanitizedValue = value.replace(/[<>]/g, ''); // Basic XSS prevention
+        }
+
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: sanitizedValue
         }));
+
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+
+        // Real-time duplicate check
+        if (name === 'product_name' && value.trim().length >= 2) {
+            checkDuplicate(value);
+        } else if (name === 'product_name') {
+            setDuplicateCheck({ checking: false, exists: false });
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Prevent rapid form submission
+        const now = Date.now();
+        if (now - lastSubmitTime < 2000) { // 2 second cooldown
+            alert('Please wait a moment before submitting again');
+            return;
+        }
+
         if (!validateForm()) {
             return;
         }
 
+        setLastSubmitTime(now);
         setIsSubmitting(true);
 
         try {

@@ -26,8 +26,10 @@ builder.Services.AddCors(options =>
         });
 });
 
-// Add Product Service
+// Product Service
 builder.Services.AddScoped<IProductService, ProductService>();
+// Sanitization Service
+builder.Services.AddScoped<ISanitizationService, SanitizationService>();
 
 var app = builder.Build();
 

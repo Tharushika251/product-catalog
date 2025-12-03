@@ -17,8 +17,7 @@ npm install -D babel-loader @babel/core @babel/preset-env @babel/preset-react
 npm install -D html-webpack-plugin css-loader style-loader
 npm install -D eslint eslint-plugin-react eslint-plugin-react-hooks
 
-# Optional: TypeScript support (if needed)
-npm install -D typescript @types/react @types/react-dom
+
 
 
 
