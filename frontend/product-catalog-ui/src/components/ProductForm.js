@@ -11,7 +11,9 @@ const ProductForm = ({ onProductAdded }) => {
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [duplicateCheck, setDuplicateCheck] = useState({ checking: false, exists: false });
+    const [lastSubmitTime, setLastSubmitTime] = useState(0);
 
+    // Predefined categories for the dropdown
     const categories = [
         'Electronics',
         'Clothing',
