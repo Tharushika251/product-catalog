@@ -100,11 +100,6 @@ const ProductForm = ({ onProductAdded }) => {
             newErrors.description = 'Description cannot exceed 1000 characters';
         }
 
-        // Category (if selected)
-        if (formData.category && formData.category.length > 100) {
-            newErrors.category = 'Category cannot exceed 100 characters';
-        }
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -115,32 +110,66 @@ const ProductForm = ({ onProductAdded }) => {
         // Sanitize input
         let sanitizedValue = value;
         if (name === 'product_name' || name === 'description') {
-            sanitizedValue = value.replace(/[<>]/g, ''); // Basic XSS prevention
+            sanitizedValue = value.replace(/[<>]/g, '');
         }
 
+        // PRICE VALIDATION WHILE TYPING
+        if (name === "price") {
+            if (!/^\d*\.?\d*$/.test(value)) return;   // allow only numbers + decimal
+
+            const parts = value.split(".");
+
+            // Prevent >2 decimals
+            if (parts[1] && parts[1].length > 2) {
+                setErrors(prev => ({ ...prev, price: "Only 2 decimal places allowed" }));
+                return;
+            }
+
+            // Prevent >1,000,000
+            if (value && parseFloat(value) > 1000000) {
+                setErrors(prev => ({ ...prev, price: "Price cannot exceed $1,000,000" }));
+                return;
+            }
+
+            setErrors(prev => ({ ...prev, price: "" }));
+        }
+
+        // DESCRIPTION LIVE VALIDATION
+        if (name === "description") {
+            if (sanitizedValue.length > 1000) {
+                setErrors(prev => ({ ...prev, description: "Description cannot exceed 1000 characters" }));
+            } else {
+                setErrors(prev => ({ ...prev, description: "" }));
+            }
+        }
+
+        // PRODUCT NAME LIVE VALIDATION
+        if (name === "product_name") {
+            if (sanitizedValue.length < 2) {
+                setErrors(prev => ({ ...prev, product_name: "Product name must be at least 2 characters" }));
+            } else {
+                setErrors(prev => ({ ...prev, product_name: "" }));
+            }
+        }
+
+        // Update state
         setFormData(prev => ({
             ...prev,
             [name]: sanitizedValue
         }));
 
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
-
         // Real-time duplicate check
         if (name === 'product_name' && value.trim().length >= 2) {
             checkDuplicate(value);
-        } else if (name === 'product_name') {
-            setDuplicateCheck({ checking: false, exists: false });
         }
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Stops page reload
 
         // Prevent rapid form submission
         const now = Date.now();
-        if (now - lastSubmitTime < 2000) { // 2 second cooldown
+        if (now - lastSubmitTime < 2000) { // 2 second cool down
             alert('Please wait a moment before submitting again');
             return;
         }
@@ -263,6 +292,12 @@ const ProductForm = ({ onProductAdded }) => {
                         onChange={handleChange}
                         placeholder="Enter product description"
                     ></textarea>
+
+                    {errors.description && (
+                        <div className="invalid-feedback d-block">
+                            {errors.description}
+                        </div>
+                    )}
                 </div>
 
                 <button

@@ -4,7 +4,7 @@ export const sanitizeInput = (input) => {
     // Remove potentially harmful characters
     return input
         .replace(/[<>]/g, '') // Remove HTML tags
-        .trim()
+        .trim() // Trims whitespace
         .replace(/\s+/g, ' '); // Normalize whitespace
 };
 
@@ -19,7 +19,7 @@ export const validateCategory = (category) => {
         'Other'
     ];
 
-    if (!category) return { isValid: true, message: '' }; // Optional
+    if (!category) return { isValid: true, message: '' }; 
     if (!validCategories.includes(category)) {
         return { isValid: false, message: 'Please select a valid category' };
     }

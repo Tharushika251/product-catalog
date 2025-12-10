@@ -1,5 +1,5 @@
-using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
+using System.ComponentModel.DataAnnotations; // for validation attributes
+using System.Text.RegularExpressions; // Allows to use Regex for pattern validation
 
 namespace ProductCatalog.API.DTOs
 {
@@ -11,7 +11,7 @@ namespace ProductCatalog.API.DTOs
         [CustomValidation(typeof(ProductValidations), nameof(ProductValidations.ValidateProductName))]
         public string ProductName { get; set; } = string.Empty;
 
-
+        // Price
         [Required(ErrorMessage = "Price is required")]
         [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
         [RegularExpression(@"^\d+(\.\d{1,2})?$", ErrorMessage = "Price must have up to 2 decimal places")]
@@ -28,6 +28,7 @@ namespace ProductCatalog.API.DTOs
 
     public static class ProductValidations
     {
+        // Static method called automatically during validation
         public static ValidationResult ValidateProductName(string productName, ValidationContext context)
         {
             if (string.IsNullOrWhiteSpace(productName))

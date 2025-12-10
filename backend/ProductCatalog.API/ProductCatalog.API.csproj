@@ -7,13 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    // supports OpenAPI / Swagger for API documentation
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    // connects to SQL Server   
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
+    // migrations and database management tools
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    // generates Swagger UI
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" /> 
   </ItemGroup>
 
 </Project>

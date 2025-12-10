@@ -7,8 +7,8 @@ namespace ProductCatalog.API.Services
 {
     public class ProductService : IProductService
     {
+        // Constructor - (Injects the EF Core DbContext for database operations)
         private readonly ApplicationDbContext _context;
-
         public ProductService(ApplicationDbContext context)
         {
             _context = context;
@@ -17,9 +17,11 @@ namespace ProductCatalog.API.Services
         public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
         {
             var products = await _context.Products
-                .OrderByDescending(p => p.CreatedAt)
+                .OrderByDescending(p => p.CreatedAt) // newest first
                 .ToListAsync();
 
+            // Maps Product entities to ProductDto objects.
+            // Mapping to DTOs ensures we don’t leak internal database structure to the frontend.
             return products.Select(p => new ProductDto
             {
                 Id = p.Id,
@@ -33,7 +35,7 @@ namespace ProductCatalog.API.Services
 
         public async Task<ProductDto> CreateProductAsync(CreateProductDto createProductDto)
         {
-            // Sanitize inputs
+            // Sanitize inputs - Prevents harmful content (HTML, scripts, SQL characters)
             var sanitizedName = SanitizeInput(createProductDto.ProductName);
             var sanitizedDescription = SanitizeInput(createProductDto.Description);
             var sanitizedCategory = SanitizeInput(createProductDto.Category);
@@ -50,11 +52,12 @@ namespace ProductCatalog.API.Services
             var existingProduct = await _context.Products
                 .FirstOrDefaultAsync(p => p.ProductName.ToLower() == sanitizedName.ToLower());
 
-            if (existingProduct != null)
+            if (existingProduct != null) // Case-insensitive duplicate check
             {
                 throw new InvalidOperationException($"A product with the name '{sanitizedName}' already exists.");
             }
 
+            // Create Product Entity
             var product = new Product
             {
                 ProductName = sanitizedName,
@@ -64,9 +67,11 @@ namespace ProductCatalog.API.Services
                 CreatedAt = DateTime.UtcNow
             };
 
+            // Save to Database
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
+            // Services return DTOs, not database entities - to maintain separation of concerns
             return new ProductDto
             {
                 Id = product.Id,
@@ -98,7 +103,7 @@ namespace ProductCatalog.API.Services
             // Remove potentially dangerous characters
             input = System.Text.RegularExpressions.Regex.Replace(input, @"[;""']", string.Empty);
 
-            // Trim whitespace
+            // Trim extra spaces
             return input.Trim();
         }
 

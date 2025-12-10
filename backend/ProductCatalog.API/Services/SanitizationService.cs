@@ -2,6 +2,8 @@ using System.Text.RegularExpressions;
 
 namespace ProductCatalog.API.Services
 {
+    /* centralizes sanitization logic so it can be reused across the application, 
+    improving consistency, security, and testability */
     public interface ISanitizationService
     {
         string SanitizeInput(string? input);

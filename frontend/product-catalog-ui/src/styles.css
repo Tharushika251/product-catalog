@@ -1,7 +1,9 @@
+/* Global background */
 body {
     background-color: #f8f9fa;
 }
 
+/* Product Cards */
 .product-card {
     transition: transform 0.2s;
     height: 100%;
@@ -12,17 +14,20 @@ body {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
 }
 
+/* Price */
 .price-tag {
     font-weight: bold;
     color: #198754;
 }
 
+/* Form */
 .form-container {
     background: white;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Loading Spinner Size */
 .loading-spinner {
     width: 3rem;
     height: 3rem;
@@ -34,7 +39,7 @@ body {
     border-width: 0.25em;
 }
 
-/* Improve mobile form */
+/* Mobile Optimizations */
 @media (max-width: 576px) {
     .form-container {
         padding: 1rem !important;
@@ -45,7 +50,6 @@ body {
     }
 }
 
-/* Mobile responsiveness  */
 @media (max-width: 768px) {
     .form-container {
         margin-bottom: 2rem;

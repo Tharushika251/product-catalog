@@ -6,11 +6,22 @@ namespace ProductCatalog.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
+    /* follows clean architecture using dependency injection.
+    It exposes three endpoints:
+    • GET /api/products - returns all products
+    • POST /api/products - creates a new product with validation and duplicate handling
+    • GET /api/products/check/{name} - checks if a product already exists.
+    Business logic is abstracted into the IProductService layer.
+    The controller handles validation, logs exceptions, and returns appropriate HTTP responses (200, 201, 400, 409, 500).
+    All methods are asynchronous for better scalability and performance.*/
+
     public class ProductsController : ControllerBase
-    {
+    {    
         private readonly IProductService _productService;
         private readonly ILogger<ProductsController> _logger;
 
+        // Constructor Dependency Injection - ASP.NET Core automatically injects the required services
         public ProductsController(IProductService productService, ILogger<ProductsController> logger)
         {
             _productService = productService;
@@ -43,7 +54,7 @@ namespace ProductCatalog.API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new
+                return BadRequest(new // 400 Bad Request
                 {
                     message = "Invalid product data",
                     errors = ModelState.Values
@@ -56,11 +67,11 @@ namespace ProductCatalog.API.Controllers
             try
             {
                 var product = await _productService.CreateProductAsync(createProductDto);
-                return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product);
+                return CreatedAtAction(nameof(GetProducts), new { id = product.Id }, product); 
             }
-            catch (InvalidOperationException ex)
+            catch (InvalidOperationException ex) //If product already exists
             {
-                // Handle duplicate product error
+                // Handle duplicate product error - return 409 Conflict
                 return Conflict(new
                 {
                     message = ex.Message

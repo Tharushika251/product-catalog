@@ -1,22 +1,30 @@
-using Microsoft.EntityFrameworkCore;
-using ProductCatalog.API.Models;
+using Microsoft.EntityFrameworkCore; // ORM used for database operations
+using ProductCatalog.API.Models; // Entity Framework can map product model to a database table
 
 namespace ProductCatalog.API.Data
 {
+    /* Acts as the bridge between the API and database. 
+    DbContext manages: 
+    - DB connections, Queries, Migrations, Table mappings */
     public class ApplicationDbContext : DbContext
     {
+        // constructor - (EF Core injects database configuration using dependency injection)
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
+        // Product model → Products table
         public DbSet<Product> Products { get; set; }
 
+        /* Overrides EF Core’s table configuration.
+        Allows defining: constraints, indexes, relationships, seed data */
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Add unique constraint on ProductName
+            /* Add unique constraint on ProductName 
+            - EF will throw a DbUpdateException, which service handles as a conflict(409)*/
             modelBuilder.Entity<Product>()
                 .HasIndex(p => p.ProductName)
                 .IsUnique();
@@ -42,7 +50,7 @@ namespace ProductCatalog.API.Data
                     CreatedAt = DateTime.UtcNow
                 },
                 new Product
-                {
+                { 
                     Id = 3,
                     ProductName = "Coffee Maker",
                     Price = 49.99m,
